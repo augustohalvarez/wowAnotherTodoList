@@ -8,13 +8,13 @@ const taskController = require('./controllers/taskController');
 const app = express();
 const db = require('./models/database');
 
-app.use(express.static('assets'));
+app.use(express.static(__dirname +'../dist/')); //serves the index.html
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../views/index.html'));
+  res.sendFile(path.resolve(__dirname, '../dist/index.html'));
 });
 
 app.post('/signin', usrController.verifyUsr, authController.setJWT);

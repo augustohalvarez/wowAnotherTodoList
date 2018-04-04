@@ -30,7 +30,7 @@ taskController.getTasks = (req, res) => {
     jwtVerifyAsync(token, process.env.JWT_SECRET)
       .then((payload) => {
         console.log('payload', payload);
-        
+
         return db.any('SELECT * FROM task WHERE usr_id = $1', [payload])
     })
       .then((data) => {
@@ -47,11 +47,13 @@ taskController.getTasks = (req, res) => {
 taskController.postTask = (req, res) => {
   console.log('post task...');
   const { content } = req.body; // Get user input (task content)
+  // Before we store this into the db, we also need the currentUsrID
+  // We'll grab the current userID that's stored in our encoded JWT
 
   const token = req.cookies.jwt;
   if (token) {
     // DB query must happen AFTER we finish verifying the jwt, so we chain the promises.
-    let currentUsr;
+    let currentUsr; // verify token to get current userID
     jwtVerifyAsync(token, process.env.JWT_SECRET)
       .then((payload) => {
         console.log(payload);

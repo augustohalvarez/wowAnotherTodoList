@@ -29,11 +29,10 @@ authController.setJWT = (req, res, next) => {
 
   jwtSignAsync(payload, process.env.JWT_SECRET)
     .then((token) => res.cookie('jwt', token))
-    .then(() => res.sendFile(path.resolve(__dirname, '../../views/secret.html')))
+    .then(() => res.json({success: true}))
     .catch((err) => {
       return console.log('authController setJWT error: ', err)
     })
-
 }
 
 authController.verifyJWT = (req, res, next) => {
@@ -47,7 +46,7 @@ authController.verifyJWT = (req, res, next) => {
       }
       // if successfull, "decoded" now contains the payload.
       res.locals.currentUsr = decoded.usr; // this is the payload
-      res.sendFile(path.resolve(__dirname, '../../views/secret.html'));
+      res.json({success: true});
     });
   } else {
     return res.status(403).send({

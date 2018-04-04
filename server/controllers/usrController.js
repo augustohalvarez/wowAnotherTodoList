@@ -26,15 +26,18 @@ usrController.createUsr = (req, res, next) => {
 }
 
 usrController.verifyUsr = (req, res, next) => {
-  db.any('SELECT * FROM usr WHERE email = ($1)', [req.body.emailSignin]).then((data) => {
+  console.log('req.body: ', req.body);
+  db.any('SELECT * FROM usr WHERE email = ($1)', [req.body.em]).then((data) => {
     console.log('data: ', data);
-    bcrypt.compare(req.body.passwordSignin, data[0].password, function(err, isMatch) {
+    bcrypt.compare(req.body.pw, data[0].password, function(err, isMatch) {
       if (err) return console.log(err);
       if (isMatch) {
+        console.log('UsrController, bcrypt compare, isMatch: ', isMatch);
         res.locals.currentUsr = data[0].usr_id;
         next(); // res.locals is the preffered way to send data through middleware.
       } else {
-        res.redirect('/');
+        console.log('UsrController, bcrypt compare, isMatch: ', isMatch);
+        res.status(404).end('error finding user: ', req.body.user);
       }
     });
 
