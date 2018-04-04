@@ -15,12 +15,13 @@ usrController.createUsr = (req, res, next) => {
     .then(salt => bcrypt.hash(passwordRegister, salt))
     .then(hash => db.one('INSERT INTO usr(email, password) VALUES($1, $2) RETURNING usr_id', [emailRegister, hash]))
     .then(data => {
+      // REMEMBER! res.locals is the preffered way to send data through middleware.
       res.locals.currentUsr = data.usr_id;
       next();
     })
     .catch(error => {
       console.log('failed to insert usr into db: ', error);
-      return res.status(404).end('error inserting new user into db: ', error);
+      res.status(404).end('error inserting new user into db: ', error);
     });
 
 }
@@ -32,18 +33,16 @@ usrController.verifyUsr = (req, res, next) => {
     bcrypt.compare(req.body.pw, data[0].password, function(err, isMatch) {
       if (err) return console.log(err);
       if (isMatch) {
-        console.log('UsrController, bcrypt compare, isMatch: ', isMatch);
         res.locals.currentUsr = data[0].usr_id;
-        next(); // res.locals is the preffered way to send data through middleware.
+        next();
       } else {
-        console.log('UsrController, bcrypt compare, isMatch: ', isMatch);
         res.status(404).end('error finding user: ', req.body.user);
       }
     });
 
   }).catch((error) => {
-    console.log('verify usr db error: ', error)
-    res.status(404).end('error finding user: ', req.body.user)
+    console.log('verify usr db error: ', error);
+    res.status(404).end('error finding user: ', req.body.user);
   });
 }
 

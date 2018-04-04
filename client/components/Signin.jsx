@@ -14,7 +14,7 @@ class Signin extends Component {
       em: '',
       pw: ''
     }
-    this.toggle = props.toggleAuth;
+
     this.updateEmail = this.updateEmail.bind(this);
     this.updatePassword = this.updatePassword.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -35,25 +35,26 @@ class Signin extends Component {
      };
     console.log('data: ', data);
 
-
-    // 'this' is undefined inside of ajax, so we reassign this.toggle()
-    const onSuccess = this.toggle;
     $.ajax({
       type: 'POST',
       url: '/api/signin',
       data: data,
-      success: function(res) {
-        console.log('FE success in siningin');
+      // success callback must be an arrow function to preserve the current context!
+      // Without the arrow function to bind 'this' for us...
+      // 'this' refers to the jqXHR object of the Ajax call!
+      success: (res) => {
+        console.log('FE success singing in');
         console.log('res: ', res);
-        console.log('onSuccess: ', onSuccess);
-        onSuccess();
+        console.log('this.props.toggleAuth: ', this.props.toggleAuth);
+        this.props.toggleAuth(true);
       },
-      error: function(error) {
+      error: (error) => {
+        //clear inputs, then log error
+        $('#emailSignin').val('');
+        $('#passwordSignin').val('');
         console.log('ajax error signin post request to server: ', error);
-        return;
       }
     });
-    console.log('incorrect email, password, or both');
   }
 
   render() {

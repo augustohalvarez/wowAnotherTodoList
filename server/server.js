@@ -21,7 +21,7 @@ app.post('/signin', usrController.verifyUsr, authController.setJWT);
 
 app.post('/register', usrController.createUsr, authController.setJWT);
 
-app.get('/secret', authController.verifyJWT);
+app.get('/verifyAndResetJWT', authController.verifyJWT, authController.setJWT);
 
 app.get('/getTasks', taskController.getTasks);
 

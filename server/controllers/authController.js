@@ -31,14 +31,17 @@ authController.setJWT = (req, res, next) => {
     .then((token) => res.cookie('jwt', token))
     .then(() => res.json({success: true}))
     .catch((err) => {
-      return console.log('authController setJWT error: ', err)
+      console.log('error setting JWT: ', err)
+      res.status(404).send('authController setJWT error: ');
     })
 }
 
+// This is called every time we reload the page, with the purpose of
+// checking whether or not the client has a valid JWT with us.
+// If so, we log them in and rende
 authController.verifyJWT = (req, res, next) => {
   console.log('Verifying token...');
   const token = req.cookies.jwt;
-
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
@@ -46,7 +49,7 @@ authController.verifyJWT = (req, res, next) => {
       }
       // if successfull, "decoded" now contains the payload.
       res.locals.currentUsr = decoded.usr; // this is the payload
-      res.json({success: true});
+      next();
     });
   } else {
     return res.status(403).send({
